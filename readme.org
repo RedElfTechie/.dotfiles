@@ -1,7 +1,0 @@
-* Welcome to my own lair
-
-Hi there. I have just started creating dotfiles thanks to [[System
-Crafter][https://www.youtube.com/c/SystemCrafters/featured]]. Do check
-his helpful links to start building your very own environment for
-typing and managing your life.
-
