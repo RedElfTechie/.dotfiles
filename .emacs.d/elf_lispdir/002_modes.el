@@ -1,6 +1,6 @@
 ;; Global Set Keys
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-(global-set-key (kbd "C-x C-z") 'magit)
+(global-set-key (kbd "C-x C-g") 'magit)
 
 (add-hook 'text-mode-hook 'auto-fill-mode)
 
