@@ -1,8 +1,21 @@
 ;; Main file to link all other emacs config
+
+;; The default is 800 kilobytes.  Measured in bytes.
+(setq gc-cons-threshold (* 50 1000 1000))
+
+;; Profile emacs startup
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "*** Emacs loaded in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
+
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
 (require 'package)
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/"))
 (add-to-list 'package-archives '("gnu" . "http://elpa.gnu.org/packages/"))
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
 (add-to-list 'package-archives '("elpy" . "https://jorgenschaefer.github.io/packages/"))
@@ -18,29 +31,7 @@
 (setq use-package-always-ensure t)
 
 ;; Load Evil mode at startup
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-C-i-jump nil)
-  :config
-  (evil-mode 1)
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-insert-state-map (kbd "C-h") 'evil-delete-backward-char-and-join)
-
-  ;; Use visual line motions even outside of visual-line-mode buffers
-  (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-  (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
-  (evil-set-initial-state 'messages-buffer-mode 'normal)
-  (evil-set-initial-state 'dashboard-mode 'normal))
-
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
-
-;; Use Ivy and Counsel for completions
+;; Use Ivy for completions
 (use-package ivy
   :diminish
   :bind (("C-s" . swiper)
@@ -59,6 +50,33 @@
   :init
   (ivy-mode 1))
 
+(use-package general
+  :ensure t
+  :config
+  (message "Configuring key bindings below"))
+
+(use-package company
+  :ensure t
+  :demand
+  :config
+  (add-hook 'after-init-hook 'global-company-mode)
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 1)
+  (general-define-key
+   :keymaps 'company-active-map
+   "C-o" 'company-show-location
+   "C-s" 'company-search-candidates
+   "M-n" 'company-select-next
+   "M-p" 'company-select-previous))
+
+(use-package lsp-mode
+  :hook (c++-mode . lsp)
+  :commands lsp
+  :ensure t
+  :config
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
+  (setq lsp-enable-on-type-formatting nil))
 (global-set-key (kbd "C-M-j") 'counsel-switch-buffer)
 
 (use-package which-key
@@ -73,3 +91,17 @@
 (load "~/.dotfiles/.emacs.d/elf_lispdir/001_menu_border_scrollbars.el")
 
 (load "~/.dotfiles/.emacs.d/elf_lispdir/002_modes.el")
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   '(lsp-mode company general key-chord evil-surround evil-nerd-commenter yaml-mode which-key use-package rainbow-delimiters magit ivy evil-collection doom-themes doom-modeline)))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
